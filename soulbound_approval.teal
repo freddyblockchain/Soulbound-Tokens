@@ -1,0 +1,131 @@
+#pragma version 6
+txn ApplicationID
+int 0
+==
+bnz main_l12
+txn OnCompletion
+int OptIn
+==
+bnz main_l11
+txn OnCompletion
+int CloseOut
+==
+bnz main_l10
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l9
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l8
+txn OnCompletion
+int NoOp
+==
+bnz main_l7
+err
+main_l7:
+callsub transferasset_0
+return
+main_l8:
+err
+main_l9:
+err
+main_l10:
+int 1
+return
+main_l11:
+int 1
+return
+main_l12:
+int 1
+return
+
+// transfer_asset
+transferasset_0:
+txna Assets 0
+asset_params_get AssetTotal
+store 1
+store 0
+load 1
+assert
+load 0
+int 1
+==
+assert
+txna Assets 0
+asset_params_get AssetDecimals
+store 3
+store 2
+load 3
+assert
+load 2
+int 0
+==
+assert
+txna Assets 0
+asset_params_get AssetManager
+store 5
+store 4
+load 5
+assert
+load 4
+global CurrentApplicationAddress
+==
+assert
+txna Assets 0
+asset_params_get AssetFreeze
+store 7
+store 6
+load 7
+assert
+load 6
+global CurrentApplicationAddress
+==
+assert
+txna Assets 0
+asset_params_get AssetClawback
+store 9
+store 8
+load 9
+assert
+load 8
+global CurrentApplicationAddress
+==
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txna Accounts 0
+itxn_field AssetSender
+txna Accounts 1
+itxn_field AssetReceiver
+int 1
+itxn_field AssetAmount
+txna Assets 0
+itxn_field XferAsset
+itxn_next
+int afrz
+itxn_field TypeEnum
+txna Assets 0
+itxn_field FreezeAsset
+txna Accounts 1
+itxn_field FreezeAssetAccount
+int 1
+itxn_field FreezeAssetFrozen
+itxn_next
+int acfg
+itxn_field TypeEnum
+txna Assets 0
+itxn_field ConfigAsset
+global ZeroAddress
+itxn_field ConfigAssetManager
+global CurrentApplicationAddress
+itxn_field ConfigAssetReserve
+global ZeroAddress
+itxn_field ConfigAssetFreeze
+global ZeroAddress
+itxn_field ConfigAssetClawback
+itxn_submit
+int 1
+retsub
